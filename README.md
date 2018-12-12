@@ -1,2 +1,2 @@
-# snacks-flask-api
-Small Flask Rest API 
+# REST API Using Flask 
+Small Flask Rest API for personal learning 
