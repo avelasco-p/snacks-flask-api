@@ -10,3 +10,6 @@ class User(db.Model):
     name = db.Column(db.String(50))
     password = db.Column(db.String(50))
     isAdmin = db.Column(db.Boolean)
+
+    def __init__(self, name, password, isAdmin=False):
+
