@@ -1,6 +1,7 @@
 import os
 
-from flask import Flask
+from flask import Flask, jsonify, request
+# from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def create_app(test_config=None):
@@ -31,7 +32,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def indexRoute():
-        return 'index'
+        return jsonify({"message" : "index"}), 200
 
     return app
 
