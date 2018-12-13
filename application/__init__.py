@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, jsonify, request
-# from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 
 
 def create_app(test_config=None):
@@ -9,8 +9,9 @@ def create_app(test_config=None):
 
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',
+        SECRET_KEY=os.urandom(16),
         DATABASE=os.path.join(app.instance_path, 'snacks-store.sqlite'),
+        SQLALCHEMY_DATABASE_URI='sqlite://'
     )
 
     if test_config is None:
@@ -27,9 +28,7 @@ def create_app(test_config=None):
         pass
 
 
-    db = SQLAlchemy()
-    db.init_app(app)
-
+    db = SQLAlchemy(app)
 
     @app.route('/')
     def indexRoute():
