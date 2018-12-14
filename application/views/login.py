@@ -44,7 +44,14 @@ def login():
 
     data = request.get_json()
 
-    if not data or not data.username or not data.password:
-        return jsonify({'message' : 'not enough data provided'}), 401
-    
+    if not data or not data['username'] or not data['password']:
+        return jsonify({ 'message' : 'not enough data provided' }), 401
+
+    if request.method == 'GET':
+        #get method
+        return jsonify({ 'message' : 'authentication form display' })
+    else:
+        #post method
+        return jsonify({ 'data_sent' : data }) 
+
     return jsonify({'method': method})
