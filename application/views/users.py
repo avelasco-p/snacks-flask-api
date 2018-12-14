@@ -18,7 +18,7 @@ def get_all_users():
         user_data['id'] = user._id
         user_data['username'] = user.username
         user_data['isAdmin'] = user.isAdmin
-        user_data['products_liked'] = user.product_likes
+        user_data['products_liked'] = user.products_liked
 
         output.append(user_data)
 
