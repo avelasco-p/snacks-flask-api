@@ -5,13 +5,14 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..models.user import User
 from .. import db
-from . import token_required
+from . import token_required, admin_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
 @bp.route('/')
 @token_required
-def get_all_users(current_user):
+@admin_required
+def get_all_users(admin, current_user):
     users = User.query.all()
 
     lusers = []
