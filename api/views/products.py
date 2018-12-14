@@ -66,9 +66,9 @@ def create_product(current_user):
 
 
 @bp.route('/<product_public_id>', methods=["GET"])
-def get_product_by_public_id(current_user, product_public_id):
+def get_product_by_public_id(product_public_id):
 
-    product = Product.query.filter_by(public_id=product).first()
+    product = Product.query.filter_by(public_id=product_public_id).first()
 
     if product:
         product_data = {}
