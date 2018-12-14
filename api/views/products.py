@@ -38,8 +38,8 @@ def create_product(current_user):
     if not data:
         return jsonify({'message' : 'expected json data'}), 400
 
-    name = data['name']
-    price = data['price']
+    name = data.get('name', None)
+    price = data.get('price', None)
     stock = data.get('stock', 0)
 
 
@@ -50,7 +50,7 @@ def create_product(current_user):
         return jsonify({'message' : 'no price provided for product'}), 400
 
     if price < 0 :
-        return jsonify({'message' : 'price has to be positive provided for product (in cents of dollar)'}), 400
+        return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
 
     
     new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock_qty=stock)
