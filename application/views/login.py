@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, redirect, render_template, request, url_for, jsonify, make_response
+    Blueprint, redirect, render_template, request, url_for, jsonify, make_response, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..models.user import User
@@ -44,11 +44,6 @@ def login():
     #get should return template for logging in
     #post should check for user and return jwt if successful
 
-    data = request.get_json()
-
-    if not data or not data['username'] or not data['password']:
-        return jsonify({ 'message' : 'not enough data provided' }), 401
-
     if request.method == 'GET':
         #get method
         return jsonify({ 'message' : 'authentication form display' })
@@ -68,9 +63,9 @@ def login():
             token = jwt.encode({
                 'id' : user._id, 
                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=1)
-            })
+            }, current_app.config['SECRET_KEY'])
 
             return jsonify({'token' : token.decode('UTF-8')}) 
 
 
-    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
