@@ -9,20 +9,39 @@ from . import token_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
-@bp.route('/', methods=['GET'])
+@bp.route('/')
 @token_required
 def get_all_users(current_user):
     users = User.query.all()
 
-    output = []
+    lusers = []
 
     for user in users:
         user_data = {}
-        user_data['id'] = user._id
+        user_data['public_id'] = user.public_id
         user_data['username'] = user.username
         user_data['admin'] = user.isAdmin
         user_data['products_liked'] = user.products_liked
 
-        output.append(user_data)
+        lusers.append(user_data)
 
-    return jsonify({'users': output})
+    return jsonify({'users': lusers})
+
+@bp.route('/<user_public_id>')
+@token_required
+def get_user_by_public_id(current_user, user_public_id):
+
+    user = User.query.filter_by(public_id=user_public_id).first()
+
+    if user:
+        user_data = {}
+        user_data['public_id'] = user.public_id
+        user_data['username'] = user.username
+        user_data['password'] = user.password
+        user_data['admin'] = user.isAdmin
+        user_data['products_liked'] = user.products_liked
+
+        return jsonify({"user" : user_data})
+
+
+    return jsonify({"message" : "user with public id: {0} not found".format(user_public_id)})
