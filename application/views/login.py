@@ -1,9 +1,11 @@
 from flask import (
-    Blueprint, redirect, render_template, request, url_for, jsonify
+    Blueprint, redirect, render_template, request, url_for, jsonify, make_response
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..models.user import User
 from .. import db
+import jwt
+import datetime
 
 
 #creating blueprint
@@ -29,7 +31,7 @@ def register():
         hashed_password = generate_password_hash(password, method='sha256')
 
 
-        new_user = User(name=username, password=hashed_password)
+        new_user = User(username=username, password=hashed_password)
 
         db.session.add(new_user)
         db.session.commit()
@@ -52,6 +54,23 @@ def login():
         return jsonify({ 'message' : 'authentication form display' })
     else:
         #post method
-        return jsonify({ 'data_sent' : data }) 
+        auth = request.authorization
 
-    return jsonify({'method': method})
+        if not auth or not auth.username or not auth.password:
+            return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+        user = User.query.filter_by(username=auth.username).first()
+
+        if not user:
+            return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="No user found!"'})
+
+        if check_password_hash(user.password, auth.password):
+            token = jwt.encode({
+                'id' : user._id, 
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            })
+
+            return jsonify({'token' : token.decode('UTF-8')}) 
+
+
+    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
