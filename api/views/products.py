@@ -1,15 +1,16 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
+import uuid
 
 from ..models.product import Product
 from .. import db
 from . import token_required, admin_required
 
-bp = Blueprint('products', __name__, url_prefix='/products')
+bp = Blueprint('products', __name__, url_prefix='/products/')
 
 
-@bp.route('/')
+@bp.route('/', methods=["GET"])
 def get_all_products():
     products = Product.query.all()
 
@@ -20,16 +21,48 @@ def get_all_products():
         product_data['public_id'] = product.public_id
         product_data['name'] = product.name
         product_data['price'] = product.price
-        product_stock['stock'] = product.stock_qty
+        product_data['stock'] = product.stock_qty
 
-        lproducts.append(products)
+        lproducts.append(product_data)
 
     return jsonify({'products': lproducts}), 200
 
 
-@bp.route('/<product_public_id>')
+@bp.route('/', methods=["POST"])
 @token_required
 @admin_required
+def create_product(current_user):
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'expected json data'}), 400
+
+    name = data['name']
+    price = data['price']
+    stock = data.get('stock', 0)
+
+
+    if not name:
+        return jsonify({'message' : 'no name provided for product'}), 400
+
+    if not price:
+        return jsonify({'message' : 'no price provided for product'}), 400
+
+    if price < 0 :
+        return jsonify({'message' : 'price has to be positive provided for product (in cents of dollar)'}), 400
+
+    
+    new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock_qty=stock)
+
+    db.session.add(new_product)
+    db.session.commit()
+    
+
+    return jsonify({'message' : 'product created'}), 201
+
+
+@bp.route('/<product_public_id>', methods=["GET"])
 def get_product_by_public_id(current_user, product_public_id):
 
     product = Product.query.filter_by(public_id=product).first()
