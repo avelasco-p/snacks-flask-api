@@ -20,7 +20,7 @@ def get_all_products():
         product_data = {}
         product_data['public_id'] = product.public_id
         product_data['name'] = product.name
-        product_data['price'] = product.price
+        product_data['price'] = round(float(product.price / 100), 2)
         product_data['stock'] = product.stock_qty
 
         lproducts.append(product_data)
