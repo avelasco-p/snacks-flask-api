@@ -38,10 +38,8 @@ def create_app(test_config=None):
     app.cli.add_command(init_db)
     db.init_app(app)
 
-    from .views import users
+    from .views import users, login
     app.register_blueprint(users.bp)
-
-    from .views import login
     app.register_blueprint(login.bp)
 
     return app

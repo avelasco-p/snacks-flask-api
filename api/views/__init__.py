@@ -10,6 +10,7 @@ def token_required(f):
     @wraps(f)
 
     def decorated(*args, **kwargs):
+
         token = None
 
         if 'x-access-token' in request.headers:
@@ -26,6 +27,26 @@ def token_required(f):
             return jsonify({'message' : 'invalid token'}), 401
 
 
-        return f(current_user, *args, **kwargs)
+        return f(current_user=current_user, *args, **kwargs)
+
+    return decorated
+
+def admin_required(f):
+    @wraps(f)
+
+    def decorated(*args, **kwargs):
+
+        current_user = kwargs.get('current_user', None)
+
+        if not current_user:
+            return jsonify({
+                'message' : 'current user not found in request, try to log in and add auth token'
+            }), 401
+
+        if current_user.isAdmin:
+            return f(*args, **kwargs)
+        else:
+            return jsonify({
+                'message': 'you do not posses required permissions'}), 403
 
     return decorated
