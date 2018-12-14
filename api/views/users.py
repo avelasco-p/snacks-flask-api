@@ -9,6 +9,7 @@ from . import token_required, admin_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
+
 @bp.route('/')
 @token_required
 def get_all_users(current_user):
@@ -26,6 +27,7 @@ def get_all_users(current_user):
         lusers.append(user_data)
 
     return jsonify({'users': lusers}), 200
+
 
 @bp.route('/<user_public_id>')
 @token_required
@@ -46,6 +48,7 @@ def get_user_by_public_id(current_user, user_public_id):
 
 
     return jsonify({"message" : "user with public id: {0} not found".format(user_public_id)}), 404
+
 
 @bp.route('/<user_public_id>', methods=["PATCH"])
 @token_required
@@ -77,8 +80,27 @@ def update_user(current_user, user_public_id):
 
             db.session.commit()
 
-            return jsonify({"message" : "user {0} updated".format(user_public_id),
-                            "data": user_obj}), 200
+            return jsonify({"message" : "user {0} updated".format(user_public_id)}), 200
+
+        except Exception as e:
+            print('couldnt update')
+            print(e)
+
+    return jsonify({"message" : "user with public id: {0} not found".format(user_public_id)}), 404
+
+@bp.route('/<user_public_id>', methods=["DELETE"])
+@token_required
+@admin_required
+def delete_user(current_user, user_public_id):
+
+    user = User.query.filter_by(public_id=user_public_id).first()
+
+    if user:
+        try:
+            db.session.delete(user)
+            db.session.commit()
+
+            return jsonify({"message" : "user {0} deleted".format(user_public_id)}), 200
         except Exception as e:
             print('couldnt update')
             print(e)
