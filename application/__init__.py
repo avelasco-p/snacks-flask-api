@@ -1,9 +1,18 @@
 import os
+import click
 
 from flask import Flask, jsonify, request
+from flask.cli import with_appcontext
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
+@click.command('init-db')
+@with_appcontext
+def init_db():
+    db.drop_all()
+    db.create_all()
+    click.echo('Initialized the database.')
 
 
 def create_app(test_config=None):
@@ -12,7 +21,6 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
     app.config.from_object('config')
-    print(app.config)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -27,14 +35,14 @@ def create_app(test_config=None):
     except OSError as e:
         pass
 
+    app.cli.add_command(init_db)
     db.init_app(app)
 
     from .views import users
     app.register_blueprint(users.bp)
 
-    @app.route('/')
-    def indexRoute():
-        return jsonify({"message" : "index"}), 200
+    from .views import login
+    app.register_blueprint(login.bp)
 
     return app
 
