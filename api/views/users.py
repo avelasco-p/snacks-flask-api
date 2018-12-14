@@ -88,6 +88,7 @@ def update_user(current_user, user_public_id):
 
     return jsonify({"message" : "user with public id: {0} not found".format(user_public_id)}), 404
 
+
 @bp.route('/<user_public_id>', methods=["DELETE"])
 @token_required
 @admin_required
