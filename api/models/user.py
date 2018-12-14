@@ -11,4 +11,5 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     isAdmin = db.Column(db.Boolean, nullable=False, default=False)
+    products_bought = db.relationship("Product", secondary=associations.products_bought)
     products_liked = db.relationship("Product", secondary=associations.products_likes)
