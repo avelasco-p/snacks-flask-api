@@ -1,5 +1,9 @@
-from flask import current_app
+from flask import current_app, request, jsonify
 from functools import wraps
+
+from ..models.user import User
+
+import jwt
 
 
 def token_required(f):
@@ -17,8 +21,7 @@ def token_required(f):
 
         try: 
             data = jwt.decode(token, current_app.config['SECRET_KEY'])
-            current_user = User.query.filter_by(_id=data['_id']).first()
-
+            current_user = User.query.filter_by(public_id=data['public_id']).first()
         except:
             return jsonify({'message' : 'invalid token'}), 401
 
