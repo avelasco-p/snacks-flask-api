@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from .. import db
-from . import product
+from . import product, associations
 
 
 class User(db.Model):
@@ -10,3 +10,4 @@ class User(db.Model):
     name = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     isAdmin = db.Column(db.Boolean, nullable=False, default=False)
+    product_likes = db.relationship("products", secondary=products_likes)
