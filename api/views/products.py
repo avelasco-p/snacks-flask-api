@@ -38,28 +38,31 @@ def create_product(current_user):
     if not data:
         return jsonify({'message' : 'expected json data'}), 400
 
-    name = data.get('name', None)
-    price = data.get('price', None)
-    stock = data.get('stock', 0)
+    try:
+        name = data.get('name', None)
+        price = data.get('price', None)
+        stock = data.get('stock', 0)
 
+        if not name:
+            return jsonify({'message' : 'no name provided for product'}), 400
 
-    if not name:
-        return jsonify({'message' : 'no name provided for product'}), 400
+        if not price:
+            return jsonify({'message' : 'no price provided for product'}), 400
 
-    if not price:
-        return jsonify({'message' : 'no price provided for product'}), 400
+        if price < 0 :
+            return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
 
-    if price < 0 :
-        return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
+        
+        new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock_qty=stock)
 
-    
-    new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock_qty=stock)
+        db.session.add(new_product)
+        db.session.commit()
+        
 
-    db.session.add(new_product)
-    db.session.commit()
-    
-
-    return jsonify({'message' : 'product created'}), 201
+        return jsonify({'message' : 'product created'}), 201
+    except Exception as e:
+        print(e) 
+        return jsonify({'message' : e}), 400
 
 
 @bp.route('/<product_public_id>', methods=["GET"])
