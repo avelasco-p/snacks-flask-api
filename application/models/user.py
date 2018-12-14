@@ -1,10 +1,5 @@
-from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
-
-
-db = SQLAlchemy(current_app)
+from .. import db
 
 class User(db.Model):
     """User schema """
