@@ -7,14 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-@click.command('init-db')
-@with_appcontext
-def init_db():
-    db.drop_all()
-    db.create_all()
-    click.echo('Initialized the database.')
-
-
 def create_app(test_config=None):
     # create and configure flask app
 
@@ -38,9 +30,18 @@ def create_app(test_config=None):
     app.cli.add_command(init_db)
     db.init_app(app)
 
-    from .views import users, login
+    from .views import users, login, products
     app.register_blueprint(users.bp)
     app.register_blueprint(login.bp)
+    app.register_blueprint(products.bp)
 
     return app
+
+
+@click.command('init-db')
+@with_appcontext
+def init_db():
+    db.drop_all()
+    db.create_all()
+    click.echo('Initialized the database.')
 
