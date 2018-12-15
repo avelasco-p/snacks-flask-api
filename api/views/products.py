@@ -12,11 +12,17 @@ bp = Blueprint('products', __name__, url_prefix='/products')
 
 @bp.route('/', methods=["GET"])
 def get_all_products():
-    products = Product.query.all()
+    
+    #pagination and sorting settings
+    offset = request.args.get('offset', 0) 
+    limit = request.args.get('limit', 20)
+    sort_by = request.args.get('sort', 'name')
+
+    products_page = Product.query.order_by(sort_by).paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
 
-    for product in products:
+    for product in products_page.items:
         product_data = {}
         product_data['public_id'] = product.public_id
         product_data['name'] = product.name
