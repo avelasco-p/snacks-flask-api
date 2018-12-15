@@ -9,4 +9,5 @@ class Product(db.Model):
     public_id = db.Column(db.String(50), nullable=False, unique=True)
     name = db.Column(db.String(50))
     price = db.Column(db.Integer) #in cents of dollar
-    stock_qty = db.Column(db.Integer)
+    stock = db.Column(db.Integer)
+    popularity = db.Column(db.Integer)
