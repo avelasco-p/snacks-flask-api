@@ -35,9 +35,9 @@ def create_app(test_config=None):
 
     #importing routes
     from .views import users, login, products
-    app.register_blueprint(users.bp, url_prefix='/api')
-    app.register_blueprint(login.bp, url_prefix='/api')
-    app.register_blueprint(products.bp, url_prefix='/api')
+    app.register_blueprint(users.bp, url_prefix='/api/users')
+    app.register_blueprint(login.bp, url_prefix='/api/login')
+    app.register_blueprint(products.bp, url_prefix='/api/products')
 
     return app
 

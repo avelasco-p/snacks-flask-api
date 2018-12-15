@@ -5,7 +5,6 @@ from ..models.user import User
 
 import jwt
 
-
 def token_required(f):
     @wraps(f)
 
@@ -30,6 +29,7 @@ def token_required(f):
         return f(current_user=current_user, *args, **kwargs)
 
     return decorated
+
 
 def admin_required(f):
     @wraps(f)

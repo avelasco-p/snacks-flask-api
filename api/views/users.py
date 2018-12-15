@@ -9,10 +9,10 @@ from . import token_required, admin_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
-
 @bp.route('/')
 @token_required
 def get_all_users(current_user):
+
     users = User.query.all()
 
     lusers = []
