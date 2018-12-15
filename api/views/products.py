@@ -12,13 +12,17 @@ bp = Blueprint('products', __name__, url_prefix='/products')
 
 @bp.route('/', methods=["GET"])
 def get_all_products():
-    
+
     #pagination and sorting settings
+    stock = request.args.get('stock', None)
     offset = request.args.get('offset', 0) 
     limit = request.args.get('limit', 20)
     sort_by = request.args.get('sort', 'name')
 
-    products_page = Product.query.order_by(sort_by).paginate(page=offset, per_page=limit, error_out=False)
+    products_page = Product.query
+                            .filter(Product.stock > 0)
+                            .order_by(sort_by)
+                            .paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
 
@@ -27,7 +31,8 @@ def get_all_products():
         product_data['public_id'] = product.public_id
         product_data['name'] = product.name
         product_data['price'] = round(float(product.price / 100), 2)
-        product_data['stock'] = product.stock_qty
+        product_data['stock'] = product.stock
+        product_data['popularity'] = product.popularity
 
         lproducts.append(product_data)
 
@@ -59,7 +64,7 @@ def create_product(current_user):
             return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
 
         
-        new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock_qty=stock)
+        new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock=stock)
 
         db.session.add(new_product)
         db.session.commit()
@@ -81,7 +86,8 @@ def get_product_by_public_id(product_public_id):
         product_data['public_id'] = product.public_id
         product_data['name'] = product.name
         product_data['price'] = round(product.price / 100)
-        product_data['stock'] = product.stock_qty
+        product_data['stock'] = product.stock
+        product_data['popularity'] = product.popularity
 
         return jsonify({"product" : product_data})
 
@@ -106,12 +112,12 @@ def update_product(current_user, product_public_id):
 
             product.name = name if name else product.name
             product.price = round(price / 100) if price else product.price
-            product.stock_qty = stock if stock else product.stock_qty
+            product.stock = stock if stock else product.stock
 
             product_obj = {}
             product_obj['name'] = product.name
             product_obj['price'] = product.price
-            product_obj['stock'] = product.stock_qty
+            product_obj['stock'] = product.stock
 
             db.session.commit()
 
