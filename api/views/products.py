@@ -7,7 +7,7 @@ from ..models.product import Product
 from .. import db
 from . import token_required, admin_required
 
-bp = Blueprint('products', __name__, url_prefix='/products/')
+bp = Blueprint('products', __name__, url_prefix='/products')
 
 
 @bp.route('/', methods=["GET"])
