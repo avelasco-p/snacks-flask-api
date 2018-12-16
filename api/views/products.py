@@ -152,6 +152,48 @@ def get_product_by_public_id(product_public_id):
 
     return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
 
+@bp.route('/<product_public_id>', methods=["PUT"])
+@token_required
+@admin_required
+def replace_product(current_user):
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'expected json data for product'}), 400
+
+    try:
+        name = data.get('name', None)
+        price = data.get('price', None)
+        stock = data.get('stock', 0)
+        popularity = data.get('popularity', 0)
+
+        if not name:
+            return jsonify({'message' : 'no name provided for product'}), 400
+
+        if not price:
+            return jsonify({'message' : 'no price provided for product'}), 400
+
+        if price < 0 :
+            return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
+
+        
+        product = Product.query \
+                            .filter_by(public_id=product_public_id) \
+                            .first()
+
+        product.name = name;
+        product.price = price;
+        product.stock = stock;
+        product.popularity = popularity
+
+        db.session.commit()
+        
+        return jsonify({'message' : 'product replaced'}), 200
+    except Exception as e:
+        print(e) 
+        return jsonify({'message' : e}), 400
+
+
 
 @bp.route('/<product_public_id>', methods=["PATCH"])
 @token_required
@@ -194,5 +236,17 @@ def delete_product(current_user, product_public_id):
         except Exception as e:
             print('couldnt update')
             print(e)
+
+    return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
+
+
+@bp.route('/', methods=["DELETE"])
+@token_required
+@admin_required
+def delete_product(current_user):
+
+    all_products = Product.query.all()
+
+    db.session.delete(all_products)
 
     return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
