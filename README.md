@@ -162,8 +162,9 @@ If the user only wants to receive certain fields from the request, they can be s
 
 Available fields:
 ```
-name -> name of the product
-price -> price of the product (in US dollars $)
-stock -> number of items available in the store
-popularity -> number of likes by users
+name        -> name of the product
+price       -> price of the product (in US dollars $)
+stock       -> number of items available in the store
+popularity  -> number of likes by users
+search      -> text to search for in products name, it is surrounded by % symbols in db search query
 ```
