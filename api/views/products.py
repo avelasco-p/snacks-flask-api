@@ -19,9 +19,9 @@ def get_all_products():
     limit = request.args.get('limit', 20)
     sort_by = request.args.get('sort', 'name')
 
-    products_page = Product.query
-                            .filter(Product.stock > 0)
-                            .order_by(sort_by)
+    products_page = Product.query\
+                            .filter(Product.stock > 0)\
+                            .order_by(sort_by)\
                             .paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
