@@ -21,6 +21,7 @@ export FLASK_APP=api
 python -m flask run
 ```
 Now you can access the API on localhost at: `http://localhost:5000/api`
+For available endpoints, check the API Docs below
 
 ## API Documentation
 
