@@ -39,7 +39,7 @@ def get_all_products():
     return jsonify({'products': lproducts}), 200
 
 
-@bp.route('/', methods=["POST"])
+@bp.route('', methods=["POST"])
 @token_required
 @admin_required
 def create_product(current_user):
@@ -110,14 +110,9 @@ def update_product(current_user, product_public_id):
             price = data.get('price', None)
             stock = data.get('stock', None)
 
-            product.name = name if name else product.name
-            product.price = round(price / 100) if price else product.price
-            product.stock = stock if stock else product.stock
-
-            product_obj = {}
-            product_obj['name'] = product.name
-            product_obj['price'] = product.price
-            product_obj['stock'] = product.stock
+            product.name = data.get('name', product.name)
+            product.price = data.get('price', product.price)
+            product.stock = data.get('stock', product.stock)
 
             db.session.commit()
 
