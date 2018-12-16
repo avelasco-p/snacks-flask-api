@@ -13,15 +13,13 @@ bp = Blueprint('products', __name__, url_prefix='/products')
 @bp.route('/', methods=["GET"])
 def get_all_products():
 
-    #pagination and sorting settings
-    stock = request.args.get('stock', None)
-    offset = request.args.get('offset', 0) 
-    limit = request.args.get('limit', 20)
+    #pagination and sorting settings from params
+    offset = int(request.args.get('offset', 0)) 
+    limit = int(request.args.get('limit', 20))
     sort_by = request.args.get('sort', 'name')
+    fields = request.args.get('fields', None)
 
-
-    
-    #query
+    #query applying all params
     products_count = Product.query.count()
     products_page = Product.query\
                             .filter(Product.stock > 0)\
@@ -30,6 +28,7 @@ def get_all_products():
 
     lproducts = []
 
+    #creating list of products
     for product in products_page.items:
         product_data = {}
         product_data['public_id'] = product.public_id
@@ -40,12 +39,33 @@ def get_all_products():
 
         lproducts.append(product_data)
 
+    #headers variable
+    res_header = {}
+
+    #setting up headers values
+    res_header['Content-Type'] = 'application/json'
+    res_header['X-Total-Count'] = products_count
+
+    #setting up pagination link for headers
+    pagination_links = [
+        '<{}; rel="first"'.format(request.base_url + '?offset={0}&limit={1}'.format(0, limit)),
+        '<{}; rel="last"'.format(request.base_url + '?offset={0}&limit={1}'.format(products_page.pages - 1, limit))
+    ]
+
+    if products_page.has_prev:
+        pagination_links.append('<{}; rel="prev"'.format(request.base_url + '?offset={0}&limit={1}'.format(offset - 1, limit)))
+
+    if products_page.has_next:
+        pagination_links.append('<{}; rel="next"'.format(request.base_url + '?offset={0}&limit={1}'.format(offset + 1, limit))) 
+    
+    res_header['Link'] = []
+
+    for link in pagination_links:
+        res_header['Link'].append(link)
 
     res = make_response(jsonify({'products' : lproducts}), 200)
-    res.headers = {
-        "X-Total-Count" : products_count, 
-        "Link" : '<{0}>; rel="next"'.format(request.base_url + "?offset={0}".format(offset + 1)),
-    }
+
+    res.headers = res_header
 
     return res
 
