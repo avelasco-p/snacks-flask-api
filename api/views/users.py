@@ -22,7 +22,18 @@ def get_all_users(current_user):
         user_data['public_id'] = user.public_id
         user_data['username'] = user.username
         user_data['admin'] = user.isAdmin
-        user_data['products_liked'] = user.products_liked
+
+        lproducts_liked = []
+        for product_liked in user.products_liked:
+            product_data = {}
+
+            product_data['public_id'] = product_liked.public_id
+            product_data['name'] = product_liked.name
+            product_data['price'] = product_liked.price
+            product_data['stock'] = product_liked.stock
+            lproducts_liked.append(product_data)
+
+        user_data['products_liked'] = lproducts_liked
 
         lusers.append(user_data)
 
