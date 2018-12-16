@@ -31,7 +31,7 @@ def login():
     if check_password_hash(user.password, auth.password):
         token = jwt.encode({
             'public_id' : user.public_id, 
-            'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=60)
+            'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=60)
         }, current_app.config['SECRET_KEY'])
 
         return jsonify({'token' : token.decode('UTF-8')}), 202
@@ -52,10 +52,10 @@ def register():
         password = data['password']
 
         if not user:
-            return jsonify({'message' : 'no username in data provided'}), 400
+            return jsonify({'message' : 'The JSON is not valid'}), 400
 
         if not password:
-            return jsonify({'message' : 'no username in data provided'}), 400
+            return jsonify({'message' : 'The JSON is not valid'}), 400
 
         hashed_password = generate_password_hash(password, method='sha256')
 
