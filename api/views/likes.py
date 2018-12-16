@@ -11,7 +11,7 @@ from .. import db
 bp = Blueprint('likes', __name__, url_prefix='/api/likes')
 
 
-@bp.route('/<public_product_id>', methods=['POST'])
+@bp.route('/<public_product_id>', methods=['PUT', 'PATCH'])
 @token_required
 def like_one_product(current_user, public_product_id):
 
