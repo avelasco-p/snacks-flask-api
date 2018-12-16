@@ -124,6 +124,7 @@ Server -> Werkzeug/0.14.1 Python/3.7.1
 Date -> Sun, 16 Dec 2018 20:55:29 GMT
 ```
 **Content example**
+
 ```json
 {
   "products": [
@@ -147,6 +148,7 @@ Date -> Sun, 16 Dec 2018 20:55:29 GMT
 ```
 
 **Sorting**
+
 To sort the list by a field, use the sort parameter with a symbol as the first character. 
 ```
 (+) -> sort in ascending order
@@ -154,6 +156,7 @@ To sort the list by a field, use the sort parameter with a symbol as the first c
 ```
 
 **Pagination**
+
 By default, the list of products is paginated with the following values:
 ```
 offset = 0
@@ -162,6 +165,7 @@ limit = 20
 You can specify them in the parameters as you wish. The number of items, as well as link to the prev, next, first and last page is specified in the headers.
 
 **Filtering fields**
+
 If the user only wants to receive certain fields from the request, they can be specified with a comma separated value.
 
 Available fields:
