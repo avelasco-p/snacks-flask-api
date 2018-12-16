@@ -109,13 +109,21 @@ def create_product(current_user):
         stock = data.get('stock', 0)
 
         if not name:
-            return jsonify({'message' : 'no name provided for product'}), 400
+            return jsonify({
+                'message' : 'The JSON is invalid',
+                'error' : 'No name provided in JSON body'
+            }), 400
 
         if not price:
-            return jsonify({'message' : 'no price provided for product'}), 400
+            return jsonify({
+                'message' : 'The JSON is invalid',
+                'error' : 'No price provided in JSON body'
+                }), 400
 
         if price < 0 :
-            return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
+            return jsonify({
+                'message' : 'price has to be positive (in cents of dollar)'
+            }), 400
 
         
         new_product = Product(public_id=str(uuid.uuid4()), name=name, price=price, stock=stock)
@@ -161,6 +169,7 @@ def get_product_by_public_id(product_public_id):
 
     return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
 
+
 @bp.route('/<product_public_id>', methods=["PUT"])
 @token_required
 @admin_required
@@ -177,13 +186,22 @@ def replace_product(current_user):
         popularity = data.get('popularity', 0)
 
         if not name:
-            return jsonify({'message' : 'The JSON is invalid'}), 400
+            return jsonify({
+                'message' : 'The JSON is invalid',
+                'error' : 'No name provided in JSON body'
+            }), 400
 
         if not price:
-            return jsonify({'message' : 'The JSON is invalid'}), 400
+            return jsonify({
+                'message' : 'The JSON is invalid',
+                'error' : 'No price provided in JSON body'
+            }), 400
 
         if price < 0 :
-            return jsonify({'message' : 'The JSON is invalid'}), 400
+            return jsonify({
+                'message' : 'The JSON is invalid'
+                'error' : 'Price cant be lower than 0'
+            }), 400
 
         
         product = Product.query \
@@ -197,7 +215,7 @@ def replace_product(current_user):
 
         db.session.commit()
         
-        return jsonify({'message' : 'product replaced'}), 200
+        return jsonify({'message' : 'product data replaced'}), 200
     except Exception as e:
         print(e) 
         return jsonify({'message' : e}), 400
