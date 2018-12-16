@@ -10,9 +10,35 @@ from .. import db
 #creating blueprint
 bp = Blueprint('buys', __name__, url_prefix='/api/buys')
 
-# @bp.route('')
-# @token_required
-# def buy_products(current_user)
+@bp.route('', methods=['PUT', 'PATCH'])
+@token_required
+def buy_products(current_user):
+
+    data = request.get_json()
+
+    products_shop = data.get('products', [])
+
+    if not products_shop:
+        return jsonify({'message' : 'The JSON is invalid'}), 400
+
+    for product_shopped in products_shop:
+        product_p_id = product_shopped.get('public_id', None)
+        product_qty = product_shopped.get('quantity', 1)
+
+        if product_p_id:
+            product = Product.query.filter_by(public_id=product_p_id).first()
+
+            if product.stock >= product_qty:
+                product.stock -= product_qty
+                current_user.products_bought.append(product)
+
+                db.session.commit()
+            else:
+                return jsonify({'message': 'product out of stock for {}'.format(product_qty)})
+        else:
+            return jsonify({'message': 'The JSON is invalid'}), 400
+        
+    return jsonify({'message' : 'products bought successfuly'}), 200
 
 
 @bp.route('/<public_product_id>', methods=['PUT', 'PATCH'])
