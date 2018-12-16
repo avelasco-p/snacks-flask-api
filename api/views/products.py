@@ -1,11 +1,14 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, make_response
 )
+from sqlalchemy import asc, desc
+from sqlalchemy.orm import load_only
 import uuid
 
 from ..models.product import Product
 from .. import db
 from . import token_required, admin_required
+
 
 bp = Blueprint('products', __name__, url_prefix='/products')
 
@@ -16,14 +19,21 @@ def get_all_products():
     #pagination and sorting settings from params
     offset = int(request.args.get('offset', 0)) 
     limit = int(request.args.get('limit', 20))
-    sort_by = request.args.get('sort', 'name')
+    sort_by = request.args.get('sort', '+name')
     fields = request.args.get('fields', None)
 
+    #multiple params from single object
+    fields = fields.split(',') if fields else None
+
+    column_sort_by = getattr(Product, sort_by[1:])
+
     #query applying all params
+    print(Product.name)
     products_count = Product.query.count()
-    products_page = Product.query\
-                            .filter(Product.stock > 0)\
-                            .order_by(sort_by)\
+    products_page = Product.query \
+                            .filter(Product.stock > 0) \
+                            .order_by(desc(column_sort_by) if sort_by[0] == "-" else asc(column_sort_by)) \
+                            .with_entities(*fields if fields else '*') \
                             .paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
@@ -31,11 +41,16 @@ def get_all_products():
     #creating list of products
     for product in products_page.items:
         product_data = {}
-        product_data['public_id'] = product.public_id
-        product_data['name'] = product.name
-        product_data['price'] = round(float(product.price / 100), 2)
-        product_data['stock'] = product.stock
-        product_data['popularity'] = product.popularity
+
+        if fields:
+            for field in fields:
+                product_data[field] = getattr(product, field)
+        else:
+            product_data['public_id'] = product.public_id
+            product_data['name'] = product.name
+            product_data['price'] = round(float(product.price / 100), 2)
+            product_data['stock'] = product.stock
+            product_data['popularity'] = product.popularity
 
         lproducts.append(product_data)
 
