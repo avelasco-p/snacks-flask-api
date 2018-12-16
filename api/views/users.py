@@ -13,21 +13,19 @@ bp = Blueprint('users', __name__, url_prefix='/api/users')
 @token_required
 @admin_required
 def get_all_users(current_user):
-
     users = User.query.all()
 
     lusers = []
 
-    lproducts_liked = []
-
     for user in users:
+        lproducts_liked = []
         user_data = {}
         user_data['public_id'] = user.public_id
         user_data['username'] = user.username
         user_data['admin'] = user.isAdmin
 
-        product_liked_data = {}
         for product_liked in user.products_liked:
+            product_liked_data = {}
             product_liked_data['name'] = product_liked.name
             product_liked_data['price'] = product_liked.price
             product_liked_data['stock'] = product_liked.stock
