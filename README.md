@@ -8,6 +8,8 @@ Small Flask Rest API for personal learning
 - python3-pip
 - python3-venv
 
+### Setting up and running project
+
 Then, on the project repository, do the following:
 ```shell
 python3 -m venv venv
@@ -19,6 +21,8 @@ export FLASK_APP=api
 python -m flask run
 ```
 Now you can access the API on localhost at: `http://localhost:5000/api`
+
+For available endpoints, check the API Docs below
 
 ## API Documentation
 
