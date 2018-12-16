@@ -28,12 +28,11 @@ def get_all_products():
     column_sort_by = getattr(Product, sort_by[1:])
 
     #query applying all params
-    print(Product.name)
     products_count = Product.query.count()
     products_page = Product.query \
                             .filter(Product.stock > 0) \
                             .order_by(desc(column_sort_by) if sort_by[0] == "-" else asc(column_sort_by)) \
-                            .with_entities(*fields if fields else '*') \
+                            .with_entities(*fields if fields else Product.__table__.columns) \
                             .paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
@@ -90,7 +89,6 @@ def get_all_products():
 @token_required
 @admin_required
 def create_product(current_user):
-
     data = request.get_json()
 
     if not data:
@@ -125,18 +123,31 @@ def create_product(current_user):
 
 @bp.route('/<product_public_id>', methods=["GET"])
 def get_product_by_public_id(product_public_id):
+    #param for selecting only some columns
+    fields = request.args.get('fields', None)
 
-    product = Product.query.filter_by(public_id=product_public_id).first()
+    #multiple params from single object
+    fields = fields.split(',') if fields else None
+
+    product = Product.query \
+                .filter_by(public_id=product_public_id) \
+                .with_entities(*fields if fields else Product.__table__.columns) \
+                .first()
 
     if product:
         product_data = {}
-        product_data['public_id'] = product.public_id
-        product_data['name'] = product.name
-        product_data['price'] = round(product.price / 100)
-        product_data['stock'] = product.stock
-        product_data['popularity'] = product.popularity
 
-        return jsonify({"product" : product_data})
+        if fields:
+            for field in fields:
+                product_data[field] = getattr(product, field)
+        else:
+            product_data['public_id'] = product.public_id
+            product_data['name'] = product.name
+            product_data['price'] = round(product.price / 100)
+            product_data['stock'] = product.stock
+            product_data['popularity'] = product.popularity
+
+        return jsonify({"product" : product_data}), 200
 
 
     return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
@@ -146,17 +157,12 @@ def get_product_by_public_id(product_public_id):
 @token_required
 @admin_required
 def update_product(current_user, product_public_id):
-
     data = request.get_json()
 
     product = Product.query.filter_by(public_id=product_public_id).first()
 
     if product and data:
         try:
-            name = data.get('name', None)
-            price = data.get('price', None)
-            stock = data.get('stock', None)
-
             product.name = data.get('name', product.name)
             product.price = data.get('price', product.price)
             product.stock = data.get('stock', product.stock)
@@ -184,7 +190,7 @@ def delete_product(current_user, product_public_id):
             db.session.delete(product)
             db.session.commit()
 
-            return jsonify({"message" : "product {0} deleted".format(product_public_id)}), 200
+            return jsonify({"message" : "product {0} deleted".format(product_public_id)}), 204
         except Exception as e:
             print('couldnt update')
             print(e)
