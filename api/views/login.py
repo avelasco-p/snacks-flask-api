@@ -31,10 +31,10 @@ def login():
     if check_password_hash(user.password, auth.password):
         token = jwt.encode({
             'public_id' : user.public_id, 
-            'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=60)
+            'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=60)
         }, current_app.config['SECRET_KEY'])
 
-        return jsonify({'token' : token.decode('UTF-8')}) 
+        return jsonify({'token' : token.decode('UTF-8')}), 202
 
 
     return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
@@ -45,17 +45,17 @@ def register():
     data = request.get_json()
 
     if not data:
-        return jsonify({'message' : 'expected json data'})
+        return jsonify({'message' : 'expected json data'}), 400
 
     if request.method == 'POST':
         user = data['username']
         password = data['password']
 
         if not user:
-            return jsonify({'message' : 'no username in data provided'})
+            return jsonify({'message' : 'The JSON is not valid'}), 400
 
         if not password:
-            return jsonify({'message' : 'no username in data provided'})
+            return jsonify({'message' : 'The JSON is not valid'}), 400
 
         hashed_password = generate_password_hash(password, method='sha256')
 
@@ -65,4 +65,4 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({'message': 'new user created'})
+        return jsonify({'message': 'new user created'}), 201

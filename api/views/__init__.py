@@ -5,7 +5,6 @@ from ..models.user import User
 
 import jwt
 
-
 def token_required(f):
     @wraps(f)
 
@@ -16,7 +15,6 @@ def token_required(f):
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
 
-        
         if not token:
             return jsonify({'message' : 'token is missing'}), 401
 
@@ -30,6 +28,7 @@ def token_required(f):
         return f(current_user=current_user, *args, **kwargs)
 
     return decorated
+
 
 def admin_required(f):
     @wraps(f)
