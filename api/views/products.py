@@ -199,7 +199,7 @@ def replace_product(current_user):
 
         if price < 0 :
             return jsonify({
-                'message' : 'The JSON is invalid'
+                'message' : 'The JSON is invalid',
                 'error' : 'Price cant be lower than 0'
             }), 400
 
