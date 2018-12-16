@@ -159,7 +159,7 @@ def replace_product(current_user):
     data = request.get_json()
 
     if not data:
-        return jsonify({'message' : 'expected json data for product'}), 400
+        return jsonify({'message' : 'The JSON is invalid'}), 400
 
     try:
         name = data.get('name', None)
@@ -168,13 +168,13 @@ def replace_product(current_user):
         popularity = data.get('popularity', 0)
 
         if not name:
-            return jsonify({'message' : 'no name provided for product'}), 400
+            return jsonify({'message' : 'The JSON is invalid'}), 400
 
         if not price:
-            return jsonify({'message' : 'no price provided for product'}), 400
+            return jsonify({'message' : 'The JSON is invalid'}), 400
 
         if price < 0 :
-            return jsonify({'message' : 'price has to be positive (in cents of dollar)'}), 400
+            return jsonify({'message' : 'The JSON is invalid'}), 400
 
         
         product = Product.query \
@@ -248,5 +248,6 @@ def delete_product(current_user):
     all_products = Product.query.all()
 
     db.session.delete(all_products)
+    db.session.commit()
 
-    return jsonify({"message" : "product with public id: {0} not found".format(product_public_id)}), 404
+    return jsonify({"message" : "products deleted"}), 204
