@@ -102,7 +102,7 @@ Get all available products endpoint
 ##### Sample Call
 ###### Success Response
 
-For a call where the products have to be sorted in descending order, with pagination using page = 0 (offset), number of items per page = 3 and only getting the fields : name, price and stock, you can use the following URL.
+For a request where the user wants the products be sorted in descending order by popularity, with pagination using page = 0 (offset), number of items per page = 3 and only getting the fields : name, price and stock, you can use the following URL.
 
 **Request URL** : `/api/products?sort=-popularity&offset=0&limit=3&fields=name,price,stock`
 
