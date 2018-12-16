@@ -1,7 +1,7 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, make_response
 )
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, and_, or_
 from sqlalchemy.orm import load_only
 import uuid
 
@@ -20,6 +20,7 @@ def get_all_products():
     limit = int(request.args.get('limit', 20))
     sort_by = request.args.get('sort', '+name')
     fields = request.args.get('fields', None)
+    search = request.args.get('search', None)
 
     #multiple params from single object
     fields = fields.split(',') if fields else None
@@ -30,10 +31,10 @@ def get_all_products():
     #query applying all params
     products_count = Product.query.count()
     products_page = Product.query \
-                            .filter(Product.stock > 0) \
+                            .filter(and_(Product.stock > 0, Product.name.like('%' + search + '%') if search else True)) \
                             .order_by(desc(column_sort_by) if sort_by[0] == "-" else asc(column_sort_by)) \
                             .with_entities(*fields if fields else Product.__table__.columns) \
-                            .paginate(page=offset, per_page=limit, error_out=True)
+                            .paginate(page=offset, per_page=limit, error_out=False)
 
     lproducts = []
 
