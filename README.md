@@ -112,9 +112,9 @@ For a request where the user wants the products be sorted in descending order by
 ```
 Content-Type -> application/json
 X-Total-Count -> 1000
-Link -> <http://localhost:5000/api/products/?offset=0&limit=3; rel="first"
-Link -> <http://localhost:5000/api/products/?offset=325&limit=3; rel="last"
-Link -> <http://localhost:5000/api/products/?offset=1&limit=3; rel="next"
+Link -> <http://localhost:5000/api/products/?offset=0&limit=3>; rel="first"
+Link -> <http://localhost:5000/api/products/?offset=325&limit=3>; rel="last"
+Link -> <http://localhost:5000/api/products/?offset=1&limit=3>; rel="next"
 Content-Length -> 187
 Server -> Werkzeug/0.14.1 Python/3.7.1
 Date -> Sun, 16 Dec 2018 20:55:29 GMT
@@ -157,7 +157,7 @@ limit = 20
 ```
 You can specify them in the parameters as you wish. The number of items, as well as link to the prev, next, first and last page is specified in the headers.
 
-**Filtering fields in response**
+**Filtering fields**
 If the user only wants to receive certain fields from the request, they can be specified with a comma separated value.
 
 Available fields:
