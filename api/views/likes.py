@@ -20,6 +20,7 @@ def like_one_product(current_user, public_product_id):
     if product not in current_user.products_liked:
         #adding product to list of products_liked
         current_user.products_liked.append(product)
+        product.popularity += 1
         db.session.commit()
 
         return jsonify({'message' : 'product liked'}), 200
