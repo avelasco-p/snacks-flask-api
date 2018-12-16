@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, make_response
 )
 import uuid
 
@@ -19,6 +19,10 @@ def get_all_products():
     limit = request.args.get('limit', 20)
     sort_by = request.args.get('sort', 'name')
 
+
+    
+    #query
+    products_count = Product.query.count()
     products_page = Product.query\
                             .filter(Product.stock > 0)\
                             .order_by(sort_by)\
@@ -36,7 +40,14 @@ def get_all_products():
 
         lproducts.append(product_data)
 
-    return jsonify({'products': lproducts}), 200
+
+    res = make_response(jsonify({'products' : lproducts}), 200)
+    res.headers = {
+        "X-Total-Count" : products_count, 
+        "Link" : '<{0}>; rel="next"'.format(request.base_url + "?offset={0}".format(offset + 1)),
+    }
+
+    return res
 
 
 @bp.route('', methods=["POST"])
