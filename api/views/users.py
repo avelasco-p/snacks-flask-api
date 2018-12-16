@@ -7,22 +7,33 @@ from ..models.user import User
 from .. import db
 from . import token_required, admin_required
 
-bp = Blueprint('users', __name__, url_prefix='/users')
+bp = Blueprint('users', __name__, url_prefix='/api/users')
 
 @bp.route('/')
 @token_required
+@admin_required
 def get_all_users(current_user):
 
     users = User.query.all()
 
     lusers = []
 
+    lproducts_liked = []
+
     for user in users:
         user_data = {}
         user_data['public_id'] = user.public_id
         user_data['username'] = user.username
         user_data['admin'] = user.isAdmin
-        user_data['products_liked'] = user.products_liked
+
+        product_liked_data = {}
+        for product_liked in user.products_liked:
+            product_liked_data['name'] = product_liked.name
+            product_liked_data['price'] = product_liked.price
+            product_liked_data['stock'] = product_liked.stock
+            lproducts_liked.append(product_liked_data)
+            
+        user_data['products_liked'] = lproducts_liked
 
         lusers.append(user_data)
 
@@ -50,7 +61,7 @@ def get_user_by_public_id(current_user, user_public_id):
     return jsonify({"message" : "user with public id: {0} not found".format(user_public_id)}), 404
 
 
-@bp.route('/<user_public_id>', methods=["PATCH"])
+@bp.route('/<user_public_id>', methods=["PUT", "PATCH"])
 @token_required
 @admin_required
 def update_user(current_user, user_public_id):
@@ -73,10 +84,6 @@ def update_user(current_user, user_public_id):
             user.password = hashed_password if password else user.password
             user.isAdmin = admin if admin else user.isAdmin
             user.products_liked = products_liked if products_liked else user.products_liked
-
-
-            user_obj = {}
-            user_obj['admin'] = user.isAdmin
 
             db.session.commit()
 
@@ -101,7 +108,7 @@ def delete_user(current_user, user_public_id):
             db.session.delete(user)
             db.session.commit()
 
-            return jsonify({"message" : "user {0} deleted".format(user_public_id)}), 200
+            return jsonify({"message" : "user {0} deleted".format(user_public_id)}), 204
         except Exception as e:
             print('couldnt update')
             print(e)
