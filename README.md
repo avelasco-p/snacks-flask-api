@@ -8,6 +8,8 @@ Small Flask Rest API for personal learning
 - python3-pip
 - python3-venv
 
+### Setting up and running project
+
 Then, on the project repository, do the following:
 ```shell
 python3 -m venv venv
