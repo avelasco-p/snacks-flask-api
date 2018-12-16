@@ -42,12 +42,15 @@ def login():
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'message' : 'expected json data'}), 400
+    if request.method == 'GET':
+        return jsonify({'message' : 'not implemented yet'}), 400
 
     if request.method == 'POST':
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'message' : 'expected json data'}), 400
+
         user = data['username']
         password = data['password']
 
@@ -58,7 +61,6 @@ def register():
             return jsonify({'message' : 'The JSON is not valid'}), 400
 
         hashed_password = generate_password_hash(password, method='sha256')
-
 
         new_user = User(public_id=str(uuid.uuid4()), username=user, password=hashed_password)
 

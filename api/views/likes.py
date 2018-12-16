@@ -31,10 +31,11 @@ def buy_products(current_user):
                 product.popularity += 1
                 current_user.products_liked.append(product)
 
-                db.session.commit()
         else:
             return jsonify({'message': 'The JSON is invalid'}), 400
-        
+
+    db.session.commit()
+
     return jsonify({'message' : 'products liked successfuly'}), 200
 
 
@@ -43,6 +44,10 @@ def buy_products(current_user):
 def like_one_product(current_user, public_product_id):
 
     product = Product.query.filter_by(public_id=public_product_id).first()
+
+    print(product)
+    print(current_user)
+    print(current_user.products_liked)
 
     if product not in current_user.products_liked:
         #adding product to list of products_liked
