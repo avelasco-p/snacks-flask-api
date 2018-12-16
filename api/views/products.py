@@ -64,15 +64,23 @@ def get_all_products():
 
     #setting up pagination link for headers
     pagination_links = [
-        '<{}; rel="first"'.format(request.base_url + '?offset={0}&limit={1}'.format(0, limit)),
-        '<{}; rel="last"'.format(request.base_url + '?offset={0}&limit={1}'.format(products_page.pages - 1, limit))
+        '<{}>; rel="first"' \
+                .format(request.base_url + '?offset={0}&limit={1}{2}' \
+                                                        .format(0, limit, '&search=' + search if search else '')),
+        '<{}>; rel="last"' \
+                .format(request.base_url + '?offset={0}&limit={1}{2}' \
+                                                        .format(products_page.pages - 1, limit, '&search=' + search if search else ''))
     ]
 
     if products_page.has_prev:
-        pagination_links.append('<{}; rel="prev"'.format(request.base_url + '?offset={0}&limit={1}'.format(offset - 1, limit)))
+        pagination_links.append('<{}>; rel="prev"' \
+                                    .format(request.base_url + '?offset={0}&limit={1}{2}' \
+                                                                    .format(offset - 1, limit, '&search=' + search if search else '')))
 
     if products_page.has_next:
-        pagination_links.append('<{}; rel="next"'.format(request.base_url + '?offset={0}&limit={1}'.format(offset + 1, limit))) 
+        pagination_links.append('<{}>; rel="next"'
+                                    .format(request.base_url + '?offset={0}&limit={1}{2}' \
+                                                                    .format(offset + 1, limit, '&search=' + search if search else ''))) 
     
     res_header['Link'] = []
 
