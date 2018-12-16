@@ -34,10 +34,11 @@ def create_app(test_config=None):
     db.init_app(app)
 
     #importing routes
-    from .views import users, login, products
+    from .views import users, login, products, likes
     app.register_blueprint(users.bp, url_prefix='/api/users')
     app.register_blueprint(login.bp, url_prefix='/api')
     app.register_blueprint(products.bp, url_prefix='/api/products')
+    app.register_blueprint(likes.bp, url_prefix='/api/likes')
 
     return app
 

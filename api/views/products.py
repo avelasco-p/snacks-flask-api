@@ -10,7 +10,7 @@ from .. import db
 from . import token_required, admin_required
 
 
-bp = Blueprint('products', __name__, url_prefix='/products')
+bp = Blueprint('products', __name__, url_prefix='/api/products')
 
 
 @bp.route('/', methods=["GET"])
@@ -243,7 +243,7 @@ def delete_product(current_user, product_public_id):
 @bp.route('/', methods=["DELETE"])
 @token_required
 @admin_required
-def delete_product(current_user):
+def delete_all_products(current_user):
 
     all_products = Product.query.all()
 
