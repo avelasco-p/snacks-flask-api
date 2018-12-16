@@ -33,7 +33,7 @@ def get_all_products():
                             .filter(Product.stock > 0) \
                             .order_by(desc(column_sort_by) if sort_by[0] == "-" else asc(column_sort_by)) \
                             .with_entities(*fields if fields else Product.__table__.columns) \
-                            .paginate(page=offset, per_page=limit, error_out=False)
+                            .paginate(page=offset, per_page=limit, error_out=True)
 
     lproducts = []
 
