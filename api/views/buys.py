@@ -6,6 +6,7 @@ from . import token_required
 from ..models.user import User
 from ..models.product import Product
 from .. import db
+from ..models.associations import products_bought
 
 #creating blueprint
 bp = Blueprint('buys', __name__, url_prefix='/api/buys')
@@ -30,7 +31,11 @@ def buy_products(current_user):
 
             if product.stock >= product_qty:
                 product.stock -= product_qty
-                current_user.products_bought.append(product)
+                
+                # current_user.products_bought.append(product)
+
+                statement = products_bought.insert().values(user_id=current_user._id, product_id=product._id, product_qty=product_qty)
+                db.session.execute(statement)
 
                 db.session.commit()
             else:
@@ -57,7 +62,10 @@ def buy_one_product(current_user, public_product_id):
     #adding product to list of products_bought
     if product.stock >= qty:
         product.stock -= qty
-        current_user.products_bought.append(product)
+
+        # current_user.products_bought.append(product)
+        statement = products_bought.insert().values(user_id=current_user._id, product_id=product._id, product_qty=qty)
+        db.session.execute(statement)
 
         db.session.commit()
 
