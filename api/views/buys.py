@@ -17,12 +17,12 @@ def buy_products(current_user):
 
     data = request.get_json()
 
-    products_shop = data.get('products', [])
+    products_shopped = data.get('products', [])
 
-    if not products_shop:
+    if not products_shopped:
         return jsonify({'message' : 'The JSON is invalid'}), 400
 
-    for product_shopped in products_shop:
+    for product_shopped in products_shopped:
         product_p_id = product_shopped.get('public_id', None)
         product_qty = product_shopped.get('quantity', 1)
 
@@ -33,8 +33,10 @@ def buy_products(current_user):
                 product.stock -= product_qty
                 
                 # current_user.products_bought.append(product)
-
-                statement = products_bought.insert().values(user_id=current_user._id, product_id=product._id, product_qty=product_qty)
+                statement = products_bought.insert() \
+                                            .values(user_id=current_user._id, 
+                                                    product_id=product._id, 
+                                                    product_qty=product_qty)
                 db.session.execute(statement)
 
                 db.session.commit()
