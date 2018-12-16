@@ -15,7 +15,6 @@ bp = Blueprint('products', __name__, url_prefix='/products')
 
 @bp.route('/', methods=["GET"])
 def get_all_products():
-
     #pagination and sorting settings from params
     offset = int(request.args.get('offset', 0)) 
     limit = int(request.args.get('limit', 20))
@@ -25,6 +24,7 @@ def get_all_products():
     #multiple params from single object
     fields = fields.split(',') if fields else None
 
+    #getting column of model from params
     column_sort_by = getattr(Product, sort_by[1:])
 
     #query applying all params
@@ -42,6 +42,7 @@ def get_all_products():
     for product in products_page.items:
         product_data = {}
 
+        #filtering fields in case of param definition
         if fields:
             for field in fields:
                 product_data[field] = getattr(product, field)
