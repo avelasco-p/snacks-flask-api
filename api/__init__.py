@@ -7,12 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 def create_app(test_config=None):
     # create and configure flask app
 
     app = Flask(__name__, instance_relative_config=True)
 
-    #app configuration loaded
+    # app configuration loaded
     app.config.from_object('config')
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -27,14 +28,14 @@ def create_app(test_config=None):
     except OSError as e:
         pass
 
-    #adding init db command to app
+    # adding init db command to app
     app.cli.add_command(init_db)
 
-    #initializing database
+    # initializing database
     db.init_app(app)
 
-    #importing routes
-    from .views import users, login, products, likes,buys
+    # importing routes
+    from .views import users, login, products, likes, buys
     app.register_blueprint(users.bp, url_prefix='/api/users')
     app.register_blueprint(login.bp, url_prefix='/api')
     app.register_blueprint(products.bp, url_prefix='/api/products')
