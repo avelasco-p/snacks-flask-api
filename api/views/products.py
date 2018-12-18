@@ -172,8 +172,9 @@ def create_product(current_user):
 @bp.route('/<product_public_id>', methods=["PUT"])
 @token_required
 @admin_required
-def replace_product(current_user):
+def replace_product(current_user, product_public_id):
     data = request.get_json()
+    print(data)
 
     if not data:
         return jsonify({'message': 'The JSON is invalid'}), 400
