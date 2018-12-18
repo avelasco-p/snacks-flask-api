@@ -109,22 +109,29 @@ def create_product(current_user):
                 'error': 'No name provided in JSON body'
             }), 400
 
-            if not price:
-                return jsonify({
-                    'message': 'The JSON is invalid',
-                    'error': 'No price provided in JSON body'
-                }), 400
+        if not price:
+            return jsonify({
+                'message': 'The JSON is invalid',
+                'error': 'No price provided in JSON body'
+            }), 400
 
-                if price < 0:
-                    return jsonify({
-                        'message': 'price has to be positive (in cents of dollar)'
-                    }), 400
+        if price < 0:
+            return jsonify({
+                'message': 'price has to be positive (in cents of dollar)'
+            }), 400
 
-                    new_product = Product(public_id=str(
+        new_product = Product(public_id=str(
                         uuid.uuid4()), name=name, price=price, stock=stock)
 
-        db.session.add(new_product)
-        db.session.commit()
+
+        if new_product:
+            db.session.add(new_product)
+            db.session.commit()
+        else:
+            return jsonify({
+                'message' : 'there was an error creating your product',
+                'error' : 'Internal server error'
+            }), 500
 
         return jsonify({'message': 'product created'}), 201
     except Exception as e:
@@ -184,22 +191,21 @@ def replace_product(current_user):
                 'error': 'No name provided in JSON body'
             }), 400
 
-            if not price:
-                return jsonify({
-                    'message': 'The JSON is invalid',
-                    'error': 'No price provided in JSON body'
-                }), 400
+        if not price:
+           return jsonify({
+                'message': 'The JSON is invalid',
+                'error': 'No price provided in JSON body'
+            }), 400
 
-                if price < 0:
-                    return jsonify({
-                        'message': 'The JSON is invalid',
-                        'error': 'Price cant be lower than 0'
-                    }), 400
+        if price < 0:
+            return jsonify({
+                'message': 'The JSON is invalid',
+                'error': 'Price cant be lower than 0'
+            }), 400
 
-                    product = Product.query \
-                        .filter_by(public_id=product_public_id) \
-                        .first()
-
+        product = Product.query \
+                            .filter_by(public_id=product_public_id) \
+                            .first()
         product.name = name
         product.price = price
         product.stock = stock
