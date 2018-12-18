@@ -16,8 +16,8 @@ python3 -m venv venv
 . venv/bin/activate
   
 pip install -r requirements.txt
-  
-export FLASK_APP=api
+
+#optional: if you want to run the server on development mode export FLASK_ENV variable to 'development'
 python -m flask run
 ```
 Now you can access the API on localhost at: `http://localhost:5000/api`
