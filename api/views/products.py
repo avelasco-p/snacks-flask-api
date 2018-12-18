@@ -89,6 +89,37 @@ def get_all_products():
     return res
 
 
+@bp.route('/<product_public_id>', methods=["GET"])
+def get_product_by_public_id(product_public_id):
+    # param for selecting only some columns
+    fields = request.args.get('fields', None)
+
+    # multiple params from single object
+    fields = fields.split(',') if fields else None
+
+    product = Product.query \
+        .filter_by(public_id=product_public_id) \
+        .with_entities(*fields if fields else Product.__table__.columns) \
+        .first()
+
+    if product:
+        product_data = {}
+
+        if fields:
+            for field in fields:
+                product_data[field] = getattr(product, field)
+        else:
+            product_data['public_id'] = product.public_id
+            product_data['name'] = product.name
+            product_data['price'] = round(product.price / 100)
+            product_data['stock'] = product.stock
+            product_data['popularity'] = product.popularity
+
+        return jsonify({"product": product_data}), 200
+
+    return jsonify({"message": "product with public id: {0} not found".format(product_public_id)}), 404
+
+
 @bp.route('', methods=["POST"])
 @token_required
 @admin_required
@@ -123,7 +154,6 @@ def create_product(current_user):
         new_product = Product(public_id=str(
                         uuid.uuid4()), name=name, price=price, stock=stock)
 
-
         if new_product:
             db.session.add(new_product)
             db.session.commit()
@@ -137,37 +167,6 @@ def create_product(current_user):
     except Exception as e:
         print(e)
         return jsonify({'message': e}), 400
-
-
-@bp.route('/<product_public_id>', methods=["GET"])
-def get_product_by_public_id(product_public_id):
-    # param for selecting only some columns
-    fields = request.args.get('fields', None)
-
-    # multiple params from single object
-    fields = fields.split(',') if fields else None
-
-    product = Product.query \
-        .filter_by(public_id=product_public_id) \
-        .with_entities(*fields if fields else Product.__table__.columns) \
-        .first()
-
-    if product:
-        product_data = {}
-
-        if fields:
-            for field in fields:
-                product_data[field] = getattr(product, field)
-        else:
-            product_data['public_id'] = product.public_id
-            product_data['name'] = product.name
-            product_data['price'] = round(product.price / 100)
-            product_data['stock'] = product.stock
-            product_data['popularity'] = product.popularity
-
-        return jsonify({"product": product_data}), 200
-
-    return jsonify({"message": "product with public id: {0} not found".format(product_public_id)}), 404
 
 
 @bp.route('/<product_public_id>', methods=["PUT"])
