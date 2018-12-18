@@ -14,6 +14,9 @@ bp = Blueprint('likes', __name__, url_prefix='/api/likes')
 @token_required
 def buy_products(current_user):
 
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not authenticated in the api'}), 401
+
     data = request.get_json()
 
     products_liked = data.get('products', [])
@@ -32,7 +35,7 @@ def buy_products(current_user):
                 current_user.products_liked.append(product)
 
         else:
-            return jsonify({'message': 'The JSON is invalid'}), 400
+            return jsonify({'message': 'Product not found'}), 404
 
     db.session.commit()
 
@@ -43,11 +46,13 @@ def buy_products(current_user):
 @token_required
 def like_one_product(current_user, public_product_id):
 
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not authenticated in the api'}), 401
+
     product = Product.query.filter_by(public_id=public_product_id).first()
 
-    print(product)
-    print(current_user)
-    print(current_user.products_liked)
+    if not product:
+        return jsonify({'message' : 'Product not found'}), 404
 
     if product not in current_user.products_liked:
         #adding product to list of products_liked

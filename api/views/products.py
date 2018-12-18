@@ -124,6 +124,10 @@ def get_product_by_public_id(product_public_id):
 @token_required
 @admin_required
 def create_product(current_user):
+
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not registered in our api, please log in again'}), 401
+
     data = request.get_json()
 
     if not data:
@@ -173,8 +177,11 @@ def create_product(current_user):
 @token_required
 @admin_required
 def replace_product(current_user, product_public_id):
+
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not registered in our api, please log in again'}), 401
+
     data = request.get_json()
-    print(data)
 
     if not data:
         return jsonify({'message': 'The JSON is invalid'}), 400
@@ -206,6 +213,10 @@ def replace_product(current_user, product_public_id):
         product = Product.query \
                             .filter_by(public_id=product_public_id) \
                             .first()
+
+        if not product :
+            return jsonify({'message' : 'product with public id {} not found'.format(product_public_id)}), 404
+
         product.name = name
         product.price = price
         product.stock = stock
@@ -223,6 +234,10 @@ def replace_product(current_user, product_public_id):
 @token_required
 @admin_required
 def update_product(current_user, product_public_id):
+
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not registered in our api, please log in again'}), 401
+
     data = request.get_json()
 
     product = Product.query.filter_by(public_id=product_public_id).first()
@@ -250,6 +265,9 @@ def update_product(current_user, product_public_id):
 @token_required
 @admin_required
 def delete_product(current_user, product_public_id):
+    
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not registered in our api, please log in again'}), 401
 
     product = Product.query.filter_by(public_id=product_public_id).first()
 
@@ -266,7 +284,7 @@ def delete_product(current_user, product_public_id):
     return jsonify({"message": "product with public id: {0} not found".format(product_public_id)}), 404
 
 
-@bp.route('/', methods=["DELETE"])
+@bp.route('', methods=["DELETE"])
 @token_required
 @admin_required
 def delete_all_products(current_user):
