@@ -64,26 +64,21 @@ def get_all_products():
 
     # setting up pagination link for headers
     pagination_links = [
-        '<{}>; rel="first"'
-        .format(request.base_url + '?offset={0}&limit={1}{2}'
-                .format(0, limit, '&search=' + search if search else '')),
-        '<{}>; rel="last"'
-        .format(request.base_url + '?offset={0}&limit={1}{2}'
-                .format(products_page.pages - 1, limit, '&search=' + search if search else ''))
+        '<{}>; rel="first"'.format(request.base_url + '?offset={0}&limit={1}{2}'.format(
+            0, limit, '&search=' + search if search else '')),
+        '<{}>; rel="last"'.format(request.base_url + '?offset={0}&limit={1}{2}'.format(
+            products_page.pages - 1, limit, '&search=' + search if search else ''))
     ]
 
     if products_page.has_prev:
-        pagination_links.append('<{}>; rel="prev"'
-                                .format(request.base_url + '?offset={0}&limit={1}{2}'
-                                        .format(offset - 1, limit, '&search=' + search if search else '')))
+        pagination_links.append('<{}>; rel="prev"'.format(
+            request.base_url + '?offset={0}&limit={1}{2}'.format(offset - 1, limit, '&search=' + search if search else '')))
 
-        if products_page.has_next:
-                pagination_links.append('<{}>; rel="next"'
-                                        .format(request.base_url + '?offset={0}&limit={1}{2}'
-                                                .format(offset + 1, limit, '&search=' + search if search else '')))
+    if products_page.has_next:
+        pagination_links.append('<{}>; rel="next"'.format(
+            request.base_url + '?offset={0}&limit={1}{2}'.format(offset + 1, limit, '&search=' + search if search else '')))
 
-                res_header['Link'] = []
-
+    res_header['Link'] = []
     for link in pagination_links:
         res_header['Link'].append(link)
 
@@ -241,8 +236,8 @@ def update_product(current_user, product_public_id):
             print(e)
 
     return jsonify({
-            "message": "body data or product with public id: {0} not found".format(product_public_id)
-        }), 404
+        "message": "body data or product with public id: {0} not found".format(product_public_id)
+    }), 404
 
 
 @bp.route('/<product_public_id>', methods=["DELETE"])
