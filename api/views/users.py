@@ -13,12 +13,17 @@ bp = Blueprint('users', __name__, url_prefix='/api/users')
 @token_required
 @admin_required
 def get_all_users(current_user):
+
+    if not current_user:
+        return jsonify({'message' : 'The token provided is not authenticated in the api'}), 401
+
     users = User.query.all()
 
     lusers = []
 
     for user in users:
         lproducts_liked = []
+        lproducts_bought = []
         user_data = {}
         user_data['public_id'] = user.public_id
         user_data['username'] = user.username
@@ -26,12 +31,21 @@ def get_all_users(current_user):
 
         for product_liked in user.products_liked:
             product_liked_data = {}
+            product_liked_data['public_id'] = product_liked.public_id
             product_liked_data['name'] = product_liked.name
-            product_liked_data['price'] = product_liked.price
-            product_liked_data['stock'] = product_liked.stock
+
             lproducts_liked.append(product_liked_data)
+
+        for product_bought in user.products_bought:
+            product_bought_data = {}
+            product_bought_data['public_id'] = product_bought.public_id
+            product_bought_data['name'] = product_bought.name
+
+            lproducts_bought.append(product_bought_data)
+
             
         user_data['products_liked'] = lproducts_liked
+        user_data['products_bought'] = lproducts_bought
 
         lusers.append(user_data)
 

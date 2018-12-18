@@ -8,12 +8,17 @@ from ..models.product import Product
 from .. import db
 from ..models.associations import products_bought
 
+from datetime import datetime
+
 #creating blueprint
 bp = Blueprint('buys', __name__, url_prefix='/api/buys')
 
 @bp.route('', methods=['PUT', 'PATCH'])
 @token_required
 def buy_products(current_user):
+
+    if not current_user:
+        return jsonify({'message' : 'no user with the provided credentials, try to log in to the api'}), 400
 
     data = request.get_json()
 
@@ -43,7 +48,8 @@ def buy_products(current_user):
             else:
                 return jsonify({'message': 'product out of stock for {}'.format(product_qty)})
         else:
-            return jsonify({'message': 'The JSON is invalid'}), 400
+            return jsonify({
+                'message': 'The product was not found'}), 404
         
     return jsonify({'message' : 'products bought successfuly'}), 200
 
@@ -51,6 +57,9 @@ def buy_products(current_user):
 @bp.route('/<public_product_id>', methods=['PUT', 'PATCH'])
 @token_required
 def buy_one_product(current_user, public_product_id):
+
+    if not current_user:
+        return jsonify({'message' : 'no user with the provided credentials, try to log in to the api'}), 400
 
     data = request.get_json()
 
@@ -60,6 +69,9 @@ def buy_one_product(current_user, public_product_id):
         return jsonify({'message': 'The JSON is not valid'}), 400
 
     product = Product.query.filter_by(public_id=public_product_id).first()
+
+    if not product:
+        return jsonify({"message" : 'The product was not found'}), 404
 
     #adding product to list of products_bought
     if product.stock >= qty:
